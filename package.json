@@ -1,0 +1,30 @@
+{
+  "name": "awsp.github.io",
+  "version": "1.0.0",
+  "description": "Anthony Wu's GitHub Page",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awsp/awsp.github.io.git"
+  },
+  "keywords": [
+    "awsp",
+    "awsp.github.io",
+    "Anthony",
+    "S.",
+    "Wu"
+  ],
+  "author": "Anthony S. Wu <anthonyspwu@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/awsp/awsp.github.io/issues"
+  },
+  "homepage": "https://github.com/awsp/awsp.github.io",
+  "dependencies": {
+    "markdown": "^0.5.0",
+    "underscore": "^1.8.3"
+  }
+}

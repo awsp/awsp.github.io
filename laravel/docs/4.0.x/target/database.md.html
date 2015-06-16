@@ -1,0 +1,91 @@
+<h1>Basic Database Usage</h1>
+
+<ul><li><a href="#configuration">Configuration</a></li><li><a href="#running-queries">Running Queries</a></li><li><a href="#database-transactions">Database Transactions</a></li><li><a href="#accessing-connections">Accessing Connections</a></li><li><a href="#query-logging">Query Logging</a></li></ul>
+
+<p>&lt;a name=&quot;configuration&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Configuration</h2>
+
+<p>Laravel makes connecting with databases and running queries extremely simple. The database configuration file is <code>app/config/database.php</code>. In this file you may define all of your database connections, as well as specify which connection should be used by default. Examples for all of the supported database systems are provided in this file.</p>
+
+<p>Currently Laravel supports four database systems: MySQL, Postgres, SQLite, and SQL Server.</p>
+
+<p>&lt;a name=&quot;running-queries&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Running Queries</h2>
+
+<p>Once you have configured your database connection, you may run queries using the <code>DB</code> class.</p>
+
+<p><strong>Running A Select Query</strong></p>
+
+<pre><code>$results = DB::select(&#39;select * from users where id = ?&#39;, array(1));</code></pre>
+
+<p>The <code>select</code> method will always return an <code>array</code> of results.</p>
+
+<p><strong>Running An Insert Statement</strong></p>
+
+<pre><code>DB::insert(&#39;insert into users (id, name) values (?, ?)&#39;, array(1, &#39;Dayle&#39;));</code></pre>
+
+<p><strong>Running An Update Statement</strong></p>
+
+<pre><code>DB::update(&#39;update users set votes = 100 where name = ?&#39;, array(&#39;John&#39;));</code></pre>
+
+<p><strong>Running A Delete Statement</strong></p>
+
+<pre><code>DB::delete(&#39;delete from users&#39;);</code></pre>
+
+<blockquote><p><strong>Note:</strong> The <code>update</code> and <code>delete</code> statements return the number of rows affected by the operation.</p></blockquote>
+
+<p><strong>Running A General Statement</strong></p>
+
+<pre><code>DB::statement(&#39;drop table users&#39;);</code></pre>
+
+<p>You may listen for query events using the <code>DB::listen</code> method:</p>
+
+<p><strong>Listening For Query Events</strong></p>
+
+<pre><code>DB::listen(function($sql, $bindings, $time)
+{
+	//
+});</code></pre>
+
+<p>&lt;a name=&quot;database-transactions&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Database Transactions</h2>
+
+<p>To run a set of operations within a database transaction, you may use the <code>transaction</code> method:</p>
+
+<pre><code>DB::transaction(function()
+{
+	DB::table(&#39;users&#39;)-&gt;update(array(&#39;votes&#39; =&gt; 1));
+
+	DB::table(&#39;posts&#39;)-&gt;delete();
+});</code></pre>
+
+<p>&lt;a name=&quot;accessing-connections&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Accessing Connections</h2>
+
+<p>When using multiple connections, you may access them via the <code>DB::connection</code> method:</p>
+
+<pre><code>$users = DB::connection(&#39;foo&#39;)-&gt;select(...);</code></pre>
+
+<p>You may also access the raw, underlying PDO instance:</p>
+
+<pre><code>$pdo = DB::connection()-&gt;getPdo();</code></pre>
+
+<p>Sometimes you may need to reconnect to a given database:</p>
+
+<pre><code>DB::reconnect(&#39;foo&#39;);</code></pre>
+
+<p>&lt;a name=&quot;query-logging&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Query Logging</h2>
+
+<p>By default, Laravel keeps a log in memory of all queries that have been run for the current request. However, in some cases, such as when inserting a large number of rows, this can cause the application to use excess memory. To disable the log, you may use the <code>disableQueryLog</code> method:</p>
+
+<pre><code>DB::connection()-&gt;disableQueryLog();</code></pre>
+
+<p>To get an array of the executed queries, you may use the <code>getQueryLog</code> method:</p>
+
+<pre><code>   $queries = DB::getQueryLog();</code></pre>
