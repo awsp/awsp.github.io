@@ -1,0 +1,8 @@
+[submodule "laravel/docs/4.1.x"]
+	path = laravel/docs/4.1.x
+	url = https://github.com/awsp/laravel-docs.git
+	branch = 4.1
+[submodule "laravel/docs/4.0.x"]
+	path = laravel/docs/4.0.x
+	url = https://github.com/awsp/laravel-docs.git
+	branch = 4.0
