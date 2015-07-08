@@ -21,8 +21,7 @@ node main.js
 
 ### Development
 
-##### To generate docs, you must pull the latest docs markdown into `src` folder
+##### To generate docs, you need to fetch submodule into your repo
 ```
-git clone -b 4.0 https://github.com/awsp/laravel-docs.git src
-git clone -b 4.1 https://github.com/awsp/laravel-docs.git src
+git submodule update --init
 ```
