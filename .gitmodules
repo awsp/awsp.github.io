@@ -6,3 +6,7 @@
 	path = laravel/docs/4.0.x
 	url = https://github.com/awsp/laravel-docs.git
 	branch = 4.0
+[submodule "laravel/docs/4.2.x"]
+	path = laravel/docs/4.2.x
+	url = https://github.com/awsp/laravel-docs.git
+	branch = 4.2

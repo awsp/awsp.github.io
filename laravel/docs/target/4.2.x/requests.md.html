@@ -1,0 +1,223 @@
+<h1>Requests &amp; Input</h1>
+
+<ul><li><a href="#basic-input">Basic Input</a></li><li><a href="#cookies">Cookies</a></li><li><a href="#old-input">Old Input</a></li><li><a href="#files">Files</a></li><li><a href="#request-information">Request Information</a></li></ul>
+
+<p>&lt;a name=&quot;basic-input&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Basic Input</h2>
+
+<p>You may access all user input with a few simple methods. You do not need to worry about the HTTP verb used for the request, as input is accessed in the same way for all verbs.</p>
+
+<h4>Retrieving An Input Value</h4>
+
+<pre><code>$name = Input::get(&#39;name&#39;);</code></pre>
+
+<h4>Retrieving A Default Value If The Input Value Is Absent</h4>
+
+<pre><code>$name = Input::get(&#39;name&#39;, &#39;Sally&#39;);</code></pre>
+
+<h4>Determining If An Input Value Is Present</h4>
+
+<pre><code>if (Input::has(&#39;name&#39;))
+{
+	//
+}</code></pre>
+
+<h4>Getting All Input For The Request</h4>
+
+<pre><code>$input = Input::all();</code></pre>
+
+<h4>Getting Only Some Of The Request Input</h4>
+
+<pre><code>$input = Input::only(&#39;username&#39;, &#39;password&#39;);
+
+$input = Input::except(&#39;credit_card&#39;);</code></pre>
+
+<p>When working on forms with &quot;array&quot; inputs, you may use dot notation to access the arrays:</p>
+
+<pre><code>$input = Input::get(&#39;products.0.name&#39;);</code></pre>
+
+<blockquote><p><strong>Note:</strong> Some JavaScript libraries such as Backbone may send input to the application as JSON. You may access this data via <code>Input::get</code> like normal.</p></blockquote>
+
+<p>&lt;a name=&quot;cookies&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Cookies</h2>
+
+<p>All cookies created by the Laravel framework are encrypted and signed with an authentication code, meaning they will be considered invalid if they have been changed by the client.</p>
+
+<h4>Retrieving A Cookie Value</h4>
+
+<pre><code>$value = Cookie::get(&#39;name&#39;);</code></pre>
+
+<h4>Attaching A New Cookie To A Response</h4>
+
+<pre><code>$response = Response::make(&#39;Hello World&#39;);
+
+$response-&gt;withCookie(Cookie::make(&#39;name&#39;, &#39;value&#39;, $minutes));</code></pre>
+
+<h4>Queueing A Cookie For The Next Response</h4>
+
+<p>If you would like to set a cookie before a response has been created, use the <code>Cookie::queue()</code> method. The cookie will automatically be attached to the final response from your application.</p>
+
+<pre><code>Cookie::queue($name, $value, $minutes);</code></pre>
+
+<h4>Creating A Cookie That Lasts Forever</h4>
+
+<pre><code>$cookie = Cookie::forever(&#39;name&#39;, &#39;value&#39;);</code></pre>
+
+<p>&lt;a name=&quot;old-input&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Old Input</h2>
+
+<p>You may need to keep input from one request until the next request. For example, you may need to re-populate a form after checking it for validation errors.</p>
+
+<h4>Flashing Input To The Session</h4>
+
+<pre><code>Input::flash();</code></pre>
+
+<h4>Flashing Only Some Input To The Session</h4>
+
+<pre><code>Input::flashOnly(&#39;username&#39;, &#39;email&#39;);
+
+Input::flashExcept(&#39;password&#39;);</code></pre>
+
+<p>Since you often will want to flash input in association with a redirect to the previous page, you may easily chain input flashing onto a redirect.</p>
+
+<pre><code>return Redirect::to(&#39;form&#39;)-&gt;withInput();
+
+return Redirect::to(&#39;form&#39;)-&gt;withInput(Input::except(&#39;password&#39;));</code></pre>
+
+<blockquote><p><strong>Note:</strong> You may flash other data across requests using the <a href="/docs/4.2/session">Session</a> class.</p></blockquote>
+
+<h4>Retrieving Old Data</h4>
+
+<pre><code>Input::old(&#39;username&#39;);</code></pre>
+
+<p>&lt;a name=&quot;files&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Files</h2>
+
+<h4>Retrieving An Uploaded File</h4>
+
+<pre><code>$file = Input::file(&#39;photo&#39;);</code></pre>
+
+<h4>Determining If A File Was Uploaded</h4>
+
+<pre><code>if (Input::hasFile(&#39;photo&#39;))
+{
+	//
+}</code></pre>
+
+<p>The object returned by the <code>file</code> method is an instance of the <code>Symfony\Component\HttpFoundation\File\UploadedFile</code> class, which extends the PHP <code>SplFileInfo</code> class and provides a variety of methods for interacting with the file.</p>
+
+<h4>Determining If An Uploaded File Is Valid</h4>
+
+<pre><code>if (Input::file(&#39;photo&#39;)-&gt;isValid())
+{
+	//
+}</code></pre>
+
+<h4>Moving An Uploaded File</h4>
+
+<pre><code>Input::file(&#39;photo&#39;)-&gt;move($destinationPath);
+
+Input::file(&#39;photo&#39;)-&gt;move($destinationPath, $fileName);</code></pre>
+
+<h4>Retrieving The Path To An Uploaded File</h4>
+
+<pre><code>$path = Input::file(&#39;photo&#39;)-&gt;getRealPath();</code></pre>
+
+<h4>Retrieving The Original Name Of An Uploaded File</h4>
+
+<pre><code>$name = Input::file(&#39;photo&#39;)-&gt;getClientOriginalName();</code></pre>
+
+<h4>Retrieving The Extension Of An Uploaded File</h4>
+
+<pre><code>$extension = Input::file(&#39;photo&#39;)-&gt;getClientOriginalExtension();</code></pre>
+
+<h4>Retrieving The Size Of An Uploaded File</h4>
+
+<pre><code>$size = Input::file(&#39;photo&#39;)-&gt;getSize();</code></pre>
+
+<h4>Retrieving The MIME Type Of An Uploaded File</h4>
+
+<pre><code>$mime = Input::file(&#39;photo&#39;)-&gt;getMimeType();</code></pre>
+
+<p>&lt;a name=&quot;request-information&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Request Information</h2>
+
+<p>The <code>Request</code> class provides many methods for examining the HTTP request for your application and extends the <code>Symfony\Component\HttpFoundation\Request</code> class. Here are some of the highlights.</p>
+
+<h4>Retrieving The Request URI</h4>
+
+<pre><code>$uri = Request::path();</code></pre>
+
+<h4>Retrieving The Request Method</h4>
+
+<pre><code>$method = Request::method();
+
+if (Request::isMethod(&#39;post&#39;))
+{
+	//
+}</code></pre>
+
+<h4>Determining If The Request Path Matches A Pattern</h4>
+
+<pre><code>if (Request::is(&#39;admin/*&#39;))
+{
+	//
+}</code></pre>
+
+<h4>Get The Request URL</h4>
+
+<pre><code>$url = Request::url();</code></pre>
+
+<h4>Retrieve A Request URI Segment</h4>
+
+<pre><code>$segment = Request::segment(1);</code></pre>
+
+<h4>Retrieving A Request Header</h4>
+
+<pre><code>$value = Request::header(&#39;Content-Type&#39;);</code></pre>
+
+<h4>Retrieving Values From $_SERVER</h4>
+
+<pre><code>$value = Request::server(&#39;PATH_INFO&#39;);</code></pre>
+
+<h4>Determining If The Request Is Over HTTPS</h4>
+
+<pre><code>if (Request::secure())
+{
+	//
+}</code></pre>
+
+<h4>Determine If The Request Is Using AJAX</h4>
+
+<pre><code>if (Request::ajax())
+{
+	//
+}</code></pre>
+
+<h4>Determine If The Request Has JSON Content Type</h4>
+
+<pre><code>if (Request::isJson())
+{
+	//
+}</code></pre>
+
+<h4>Determine If The Request Is Asking For JSON</h4>
+
+<pre><code>if (Request::wantsJson())
+{
+	//
+}</code></pre>
+
+<h4>Checking The Requested Response Format</h4>
+
+<p>The <code>Request::format</code> method will return the requested response format based on the HTTP Accept header:</p>
+
+<pre><code>if (Request::format() == &#39;json&#39;)
+{
+	//
+}</code></pre>

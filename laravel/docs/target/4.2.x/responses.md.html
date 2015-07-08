@@ -1,0 +1,236 @@
+<h1>Views &amp; Responses</h1>
+
+<ul><li><a href="#basic-responses">Basic Responses</a></li><li><a href="#redirects">Redirects</a></li><li><a href="#views">Views</a></li><li><a href="#view-composers">View Composers</a></li><li><a href="#special-responses">Special Responses</a></li><li><a href="#response-macros">Response Macros</a></li></ul>
+
+<p>&lt;a name=&quot;basic-responses&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Basic Responses</h2>
+
+<h4>Returning Strings From Routes</h4>
+
+<pre><code>Route::get(&#39;/&#39;, function()
+{
+	return &#39;Hello World&#39;;
+});</code></pre>
+
+<h4>Creating Custom Responses</h4>
+
+<p>A <code>Response</code> instance inherits from the <code>Symfony\Component\HttpFoundation\Response</code> class, providing a variety of methods for building HTTP responses.</p>
+
+<pre><code>$response = Response::make($contents, $statusCode);
+
+$response-&gt;header(&#39;Content-Type&#39;, $value);
+
+return $response;</code></pre>
+
+<p>If you need access to the <code>Response</code> class methods, but want to return a view as the response content, you may use the <code>Response::view</code> method for convenience:</p>
+
+<pre><code>return Response::view(&#39;hello&#39;)-&gt;header(&#39;Content-Type&#39;, $type);</code></pre>
+
+<h4>Attaching Cookies To Responses</h4>
+
+<pre><code>$cookie = Cookie::make(&#39;name&#39;, &#39;value&#39;);
+
+return Response::make($content)-&gt;withCookie($cookie);</code></pre>
+
+<p>&lt;a name=&quot;redirects&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Redirects</h2>
+
+<h4>Returning A Redirect</h4>
+
+<pre><code>return Redirect::to(&#39;user/login&#39;);</code></pre>
+
+<h4>Returning A Redirect With Flash Data</h4>
+
+<pre><code>return Redirect::to(&#39;user/login&#39;)-&gt;with(&#39;message&#39;, &#39;Login Failed&#39;);</code></pre>
+
+<blockquote><p><strong>Note:</strong> Since the <code>with</code> method flashes data to the session, you may retrieve the data using the typical <code>Session::get</code> method.</p></blockquote>
+
+<h4>Returning A Redirect To A Named Route</h4>
+
+<pre><code>return Redirect::route(&#39;login&#39;);</code></pre>
+
+<h4>Returning A Redirect To A Named Route With Parameters</h4>
+
+<pre><code>return Redirect::route(&#39;profile&#39;, array(1));</code></pre>
+
+<h4>Returning A Redirect To A Named Route Using Named Parameters</h4>
+
+<pre><code>return Redirect::route(&#39;profile&#39;, array(&#39;user&#39; =&gt; 1));</code></pre>
+
+<h4>Returning A Redirect To A Controller Action</h4>
+
+<pre><code>return Redirect::action(&#39;HomeController@index&#39;);</code></pre>
+
+<h4>Returning A Redirect To A Controller Action With Parameters</h4>
+
+<pre><code>return Redirect::action(&#39;UserController@profile&#39;, array(1));</code></pre>
+
+<h4>Returning A Redirect To A Controller Action Using Named Parameters</h4>
+
+<pre><code>return Redirect::action(&#39;UserController@profile&#39;, array(&#39;user&#39; =&gt; 1));</code></pre>
+
+<p>&lt;a name=&quot;views&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Views</h2>
+
+<p>Views typically contain the HTML of your application and provide a convenient way of separating your controller and domain logic from your presentation logic. Views are stored in the <code>app/views</code> directory.</p>
+
+<p>A simple view could look something like this:</p>
+
+<pre><code>&lt;!-- View stored in app/views/greeting.php --&gt;
+
+&lt;html&gt;
+	&lt;body&gt;
+		&lt;h1&gt;Hello, &lt;?php echo $name; ?&gt;&lt;/h1&gt;
+	&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<p>This view may be returned to the browser like so:</p>
+
+<pre><code>Route::get(&#39;/&#39;, function()
+{
+	return View::make(&#39;greeting&#39;, array(&#39;name&#39; =&gt; &#39;Taylor&#39;));
+});</code></pre>
+
+<p>The second argument passed to <code>View::make</code> is an array of data that should be made available to the view.</p>
+
+<h4>Passing Data To Views</h4>
+
+<pre><code>// Using conventional approach
+$view = View::make(&#39;greeting&#39;)-&gt;with(&#39;name&#39;, &#39;Steve&#39;);
+
+// Using Magic Methods
+$view = View::make(&#39;greeting&#39;)-&gt;withName(&#39;steve&#39;);</code></pre>
+
+<p>In the example above the variable <code>$name</code> would be accessible from the view, and would contain <code>Steve</code>.</p>
+
+<p>If you wish, you may pass an array of data as the second parameter given to the <code>make</code> method:</p>
+
+<pre><code>$view = View::make(&#39;greetings&#39;, $data);</code></pre>
+
+<p>You may also share a piece of data across all views:</p>
+
+<pre><code>View::share(&#39;name&#39;, &#39;Steve&#39;);</code></pre>
+
+<h4>Passing A Sub-View To A View</h4>
+
+<p>Sometimes you may wish to pass a view into another view. For example, given a sub-view stored at <code>app/views/child/view.php</code>, we could pass it to another view like so:</p>
+
+<pre><code>$view = View::make(&#39;greeting&#39;)-&gt;nest(&#39;child&#39;, &#39;child.view&#39;);
+
+$view = View::make(&#39;greeting&#39;)-&gt;nest(&#39;child&#39;, &#39;child.view&#39;, $data);</code></pre>
+
+<p>The sub-view can then be rendered from the parent view:</p>
+
+<pre><code>&lt;html&gt;
+	&lt;body&gt;
+		&lt;h1&gt;Hello!&lt;/h1&gt;
+		&lt;?php echo $child; ?&gt;
+	&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<h4>Determining If A View Exists</h4>
+
+<p>If you need to check if a view exists, use the <code>View::exists</code> method:</p>
+
+<pre><code>if (View::exists(&#39;emails.customer&#39;))
+{
+	//
+}</code></pre>
+
+<p>&lt;a name=&quot;view-composers&quot;&gt;&lt;/a&gt;</p>
+
+<h2>View Composers</h2>
+
+<p>View composers are callbacks or class methods that are called when a view is rendered. If you have data that you want bound to a given view each time that view is rendered throughout your application, a view composer can organize that code into a single location. Therefore, view composers may function like &quot;view models&quot; or &quot;presenters&quot;.</p>
+
+<h4>Defining A View Composer</h4>
+
+<pre><code>View::composer(&#39;profile&#39;, function($view)
+{
+	$view-&gt;with(&#39;count&#39;, User::count());
+});</code></pre>
+
+<p>Now each time the <code>profile</code> view is rendered, the <code>count</code> data will be bound to the view.</p>
+
+<p>You may also attach a view composer to multiple views at once:</p>
+
+<pre><code>View::composer(array(&#39;profile&#39;,&#39;dashboard&#39;), function($view)
+{
+    $view-&gt;with(&#39;count&#39;, User::count());
+});</code></pre>
+
+<p>If you would rather use a class based composer, which will provide the benefits of being resolved through the application <a href="/docs/4.2/ioc">IoC Container</a>, you may do so:</p>
+
+<pre><code>View::composer(&#39;profile&#39;, &#39;ProfileComposer&#39;);</code></pre>
+
+<p>A view composer class should be defined like so:</p>
+
+<pre><code>class ProfileComposer {
+
+	public function compose($view)
+	{
+		$view-&gt;with(&#39;count&#39;, User::count());
+	}
+
+}</code></pre>
+
+<h4>Defining Multiple Composers</h4>
+
+<p>You may use the <code>composers</code> method to register a group of composers at the same time:</p>
+
+<pre><code>View::composers(array(
+	&#39;AdminComposer&#39; =&gt; array(&#39;admin.index&#39;, &#39;admin.profile&#39;),
+	&#39;UserComposer&#39; =&gt; &#39;user&#39;,
+	&#39;ProductComposer@create&#39; =&gt; &#39;product&#39;
+));</code></pre>
+
+<blockquote><p><strong>Note:</strong> There is no convention on where composer classes may be stored. You are free to store them anywhere as long as they can be autoloaded using the directives in your <code>composer.json</code> file.</p></blockquote>
+
+<h3>View Creators</h3>
+
+<p>View <strong>creators</strong> work almost exactly like view composers; however, they are fired immediately when the view is instantiated. To register a view creator, simply use the <code>creator</code> method:</p>
+
+<pre><code>View::creator(&#39;profile&#39;, function($view)
+{
+	$view-&gt;with(&#39;count&#39;, User::count());
+});</code></pre>
+
+<p>&lt;a name=&quot;special-responses&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Special Responses</h2>
+
+<h4>Creating A JSON Response</h4>
+
+<pre><code>return Response::json(array(&#39;name&#39; =&gt; &#39;Steve&#39;, &#39;state&#39; =&gt; &#39;CA&#39;));</code></pre>
+
+<h4>Creating A JSONP Response</h4>
+
+<pre><code>return Response::json(array(&#39;name&#39; =&gt; &#39;Steve&#39;, &#39;state&#39; =&gt; &#39;CA&#39;))-&gt;setCallback(Input::get(&#39;callback&#39;));</code></pre>
+
+<h4>Creating A File Download Response</h4>
+
+<pre><code>return Response::download($pathToFile);
+
+return Response::download($pathToFile, $name, $headers);</code></pre>
+
+<blockquote><p><strong>Note:</strong> Symfony HttpFoundation, which manages file downloads, requires the file being downloaded to have an ASCII file name.</p></blockquote>
+
+<p>&lt;a name=&quot;response-macros&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Response Macros</h2>
+
+<p>If you would like to define a custom response that you can re-use in a variety of your routes and controllers, you may use the <code>Response::macro</code> method:</p>
+
+<pre><code>Response::macro(&#39;caps&#39;, function($value)
+{
+	return Response::make(strtoupper($value));
+});</code></pre>
+
+<p>The <code>macro</code> function accepts a name as its first argument, and a Closure as its second. The macro&#39;s Closure will be executed when calling the macro name on the <code>Response</code> class:</p>
+
+<pre><code>return Response::caps(&#39;foo&#39;);</code></pre>
+
+<p>You may define your macros in one of your <code>app/start</code> files. Alternatively, you may organize your macros into a separate file which is included from one of your <code>start</code> files.</p>

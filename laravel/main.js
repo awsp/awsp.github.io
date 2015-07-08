@@ -9,9 +9,9 @@ var rl = readline.createInterface({
 
 rl.question('Which documentation would you like to convert? ', function (answer) {
   var i = 0;
-  var currentDir = __dirname + '/docs/' + answer + '/src/';
-  var targetDir = currentDir + '../target/';
-  var layout = '';
+  var currentDir = __dirname + '/docs/' + answer + '.x/';
+  var targetDir = __dirname + '/docs/target/' + answer + '.x/';
+  var layout = __dirname + '/docs/templates/layout.html';
 
   if (fs.existsSync(currentDir)) {
     // Create directory if it doesn't exist.

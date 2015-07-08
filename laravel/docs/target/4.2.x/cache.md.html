@@ -1,0 +1,143 @@
+<h1>Cache</h1>
+
+<ul><li><a href="#configuration">Configuration</a></li><li><a href="#cache-usage">Cache Usage</a></li><li><a href="#increments-and-decrements">Increments &amp; Decrements</a></li><li><a href="#cache-tags">Cache Tags</a></li><li><a href="#database-cache">Database Cache</a></li></ul>
+
+<p>&lt;a name=&quot;configuration&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Configuration</h2>
+
+<p>Laravel provides a unified API for various caching systems. The cache configuration is located at <code>app/config/cache.php</code>. In this file you may specify which cache driver you would like used by default throughout your application. Laravel supports popular caching backends like <a href="http://memcached.org">Memcached</a> and <a href="http://redis.io">Redis</a> out of the box.</p>
+
+<p>The cache configuration file also contains various other options, which are documented within the file, so make sure to read over these options. By default, Laravel is configured to use the <code>file</code> cache driver, which stores the serialized, cached objects in the filesystem. For larger applications, it is recommended that you use an in-memory cache such as Memcached or APC.</p>
+
+<p>&lt;a name=&quot;cache-usage&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Cache Usage</h2>
+
+<h4>Storing An Item In The Cache</h4>
+
+<pre><code>Cache::put(&#39;key&#39;, &#39;value&#39;, $minutes);</code></pre>
+
+<h4>Using Carbon Objects To Set Expire Time</h4>
+
+<pre><code>$expiresAt = Carbon::now()-&gt;addMinutes(10);
+
+Cache::put(&#39;key&#39;, &#39;value&#39;, $expiresAt);</code></pre>
+
+<h4>Storing An Item In The Cache If It Doesn&#39;t Exist</h4>
+
+<pre><code>Cache::add(&#39;key&#39;, &#39;value&#39;, $minutes);</code></pre>
+
+<p>The <code>add</code> method will return <code>true</code> if the item is actually <strong>added</strong> to the cache. Otherwise, the method will return <code>false</code>.</p>
+
+<h4>Checking For Existence In Cache</h4>
+
+<pre><code>if (Cache::has(&#39;key&#39;))
+{
+	//
+}</code></pre>
+
+<h4>Retrieving An Item From The Cache</h4>
+
+<pre><code>$value = Cache::get(&#39;key&#39;);</code></pre>
+
+<h4>Retrieving An Item Or Returning A Default Value</h4>
+
+<pre><code>$value = Cache::get(&#39;key&#39;, &#39;default&#39;);
+
+$value = Cache::get(&#39;key&#39;, function() { return &#39;default&#39;; });</code></pre>
+
+<h4>Storing An Item In The Cache Permanently</h4>
+
+<pre><code>Cache::forever(&#39;key&#39;, &#39;value&#39;);</code></pre>
+
+<p>Sometimes you may wish to retrieve an item from the cache, but also store a default value if the requested item doesn&#39;t exist. You may do this using the <code>Cache::remember</code> method:</p>
+
+<pre><code>$value = Cache::remember(&#39;users&#39;, $minutes, function()
+{
+	return DB::table(&#39;users&#39;)-&gt;get();
+});</code></pre>
+
+<p>You may also combine the <code>remember</code> and <code>forever</code> methods:</p>
+
+<pre><code>$value = Cache::rememberForever(&#39;users&#39;, function()
+{
+	return DB::table(&#39;users&#39;)-&gt;get();
+});</code></pre>
+
+<p>Note that all items stored in the cache are serialized, so you are free to store any type of data.</p>
+
+<h4>Pulling An Item From The Cache</h4>
+
+<p>If you need to retrieve an item from the cache and then delete it, you may use the <code>pull</code> method:</p>
+
+<pre><code>$value = Cache::pull(&#39;key&#39;);</code></pre>
+
+<h4>Removing An Item From The Cache</h4>
+
+<pre><code>Cache::forget(&#39;key&#39;);</code></pre>
+
+<p>&lt;a name=&quot;increments-and-decrements&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Increments &amp; Decrements</h2>
+
+<p>All drivers except <code>file</code> and <code>database</code> support the <code>increment</code> and <code>decrement</code> operations:</p>
+
+<h4>Incrementing A Value</h4>
+
+<pre><code>Cache::increment(&#39;key&#39;);
+
+Cache::increment(&#39;key&#39;, $amount);</code></pre>
+
+<h4>Decrementing A Value</h4>
+
+<pre><code>Cache::decrement(&#39;key&#39;);
+
+Cache::decrement(&#39;key&#39;, $amount);</code></pre>
+
+<p>&lt;a name=&quot;cache-tags&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Cache Tags</h2>
+
+<blockquote><p><strong>Note:</strong> Cache tags are not supported when using the <code>file</code> or <code>database</code> cache drivers. Furthermore, when using multiple tags with caches that are stored &quot;forever&quot;, performance will be best with a driver such as <code>memcached</code>, which automatically purges stale records.</p></blockquote>
+
+<h4>Accessing A Tagged Cache</h4>
+
+<p>Cache tags allow you to tag related items in the cache, and then flush all caches tagged with a given name. To access a tagged cache, use the <code>tags</code> method.</p>
+
+<p>You may store a tagged cache by passing in an ordered list of tag names as arguments, or as an ordered array of tag names:</p>
+
+<pre><code>Cache::tags(&#39;people&#39;, &#39;authors&#39;)-&gt;put(&#39;John&#39;, $john, $minutes);
+
+Cache::tags(array(&#39;people&#39;, &#39;artists&#39;))-&gt;put(&#39;Anne&#39;, $anne, $minutes);</code></pre>
+
+<p>You may use any cache storage method in combination with tags, including <code>remember</code>, <code>forever</code>, and <code>rememberForever</code>. You may also access cached items from the tagged cache, as well as use the other cache methods such as <code>increment</code> and <code>decrement</code>.</p>
+
+<h4>Accessing Items In A Tagged Cache</h4>
+
+<p>To access a tagged cache, pass the same ordered list of tags used to save it.</p>
+
+<pre><code>$anne = Cache::tags(&#39;people&#39;, &#39;artists&#39;)-&gt;get(&#39;Anne&#39;);
+
+$john = Cache::tags(array(&#39;people&#39;, &#39;authors&#39;))-&gt;get(&#39;John&#39;);</code></pre>
+
+<p>You may flush all items tagged with a name or list of names. For example, this statement would remove all caches tagged with either <code>people</code>, <code>authors</code>, or both. So, both &quot;Anne&quot; and &quot;John&quot; would be removed from the cache:</p>
+
+<pre><code>Cache::tags(&#39;people&#39;, &#39;authors&#39;)-&gt;flush();</code></pre>
+
+<p>In contrast, this statement would remove only caches tagged with <code>authors</code>, so &quot;John&quot; would be removed, but not &quot;Anne&quot;.</p>
+
+<pre><code>Cache::tags(&#39;authors&#39;)-&gt;flush();</code></pre>
+
+<p>&lt;a name=&quot;database-cache&quot;&gt;&lt;/a&gt;</p>
+
+<h2>Database Cache</h2>
+
+<p>When using the <code>database</code> cache driver, you will need to setup a table to contain the cache items. You&#39;ll find an example <code>Schema</code> declaration for the table below:</p>
+
+<pre><code>Schema::create(&#39;cache&#39;, function($table)
+{
+	$table-&gt;string(&#39;key&#39;)-&gt;unique();
+	$table-&gt;text(&#39;value&#39;);
+	$table-&gt;integer(&#39;expiration&#39;);
+});</code></pre>
