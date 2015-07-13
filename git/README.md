@@ -21,3 +21,10 @@ git submodule update --init
 ```
 git submodule update
 ```
+
+##### Remove cached submodules
+```
+git ls-files --stage [submodule_name]
+
+git rm --cached [submodule_name]
+```
