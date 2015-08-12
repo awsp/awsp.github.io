@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <link href="http://handsontable.com/bower_components/handsontable/dist/handsontable.full.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="http://handsontable.com/bower_components/handsontable/dist/handsontable.full.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    <script type="text/javascript">
+      var data = [
+	{}
+      ];
+
+      var container = document.getElementById('example');
+      var hot = new Handsontable(container, {
+        data: data,
+        rowHeaders: true,
+	minSpareRows: 1,
+	width: 500, 
+	height: 450,
+	colHeaders: true,
+
+	columns: [
+        { data: 'foo1', width: 400 },
+        { data: 'foo2' },
+        { data: 'foo3' },
+        { data: 'foo4' },
+        { data: 'foo5' },
+        { data: 'foo6' },
+        { data: 'foo7' },
+        { data: 'foo8' },
+        { data: 'foo9' },
+        { data: 'foo10' },
+        { data: 'foo11' },
+        { data: 'foo12' },
+        { data: 'foo13' }
+      ]
+
+      });
+    </script>
+  </body>
+</html>
